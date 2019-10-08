@@ -1,0 +1,369 @@
+@media print {
+    @page {
+        margin: 20px;
+    }
+    body * {
+        visibility: hidden;
+    }
+    .iframes {
+        min-height: 550px !important;
+        padding: 40px 0 0 70px !important;
+    }
+    .PrintPDF, .PrintPDF * {
+        visibility: visible;
+    }
+    .PrintPDF {
+        width: 100%;
+        visibility: hidden;
+        display: none;
+    }
+    .PrintPDF, .borderLine {
+        padding: 0px !important;
+        border: 0px !important;
+    }
+    .containerDiv {
+        margin: 0 0 !important;
+        padding: 0 !important;
+    }
+    .printHide {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        opacity: 0 !important;
+    }
+
+    .canvasPdf {
+        page-break-after: always;
+        border: 0px solid gray !important;
+    }
+    .title {
+        border: 0px !important;
+    }
+    .pageCount{
+        font-size: 12px;
+        line-height: 12px;
+    }
+    
+}
+
+.canvasPdf {
+    border: 1px solid #d6d6d6;
+    max-width: 100%;
+}
+
+.viewHide {
+    visibility: hidden;
+}
+
+.bold{
+    font-family: "Roboto Bold";
+    font-style: normal;
+}
+
+.containerDiv {
+    margin: 0 20px;
+    padding-top: 110px;
+}
+
+.toaster{
+        position: fixed !important;
+        z-index: 1111;
+        left: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        display: block !important;
+        overflow: hidden !important;
+        width: 100% !important;
+        height: 100% !important;
+        background-color: rgba(0, 0, 0, 0.5);
+        background-repeat: no-repeat;
+        background-position: center center;
+}
+
+.whiteBG{
+    background: white !important;
+    color: #333 !important;
+    font-size: 14px !important;
+    box-shadow: 0px 0px 40px 2px #333 !important;
+    font-family: "Roboto Medium";
+}
+
+.flexCenter{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.pages {
+    font-size: 16px;
+    line-height: 16px;
+    font-weight: bold;
+    padding: 0 0px 10px;
+    text-transform: capitalize;
+    color: #333;
+}
+
+.details {
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.iframes {
+    width: 100%;
+    min-height: 790px;
+}
+
+.pdf{
+    min-height: auto;
+    max-height: 1274px;
+}
+
+.PrintPDF {
+    height: 1284px;
+    overflow: hidden;
+    display: none;
+}
+
+.pdf {
+    height: 100%;
+    width: 102%;
+}
+
+.title-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: #fff;
+    text-align: center;
+}
+
+.text-hdr {
+    line-height: 18px;
+    font-size: 18px;
+    padding-bottom: 5px;
+    font-family: "Roboto Bold";
+}
+
+.print-btn-div {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 0 0 40px;
+}
+
+.title {
+    margin: 0 40px 20px 40px;
+    position: fixed;
+    width: calc(100% - 80px);
+    top: 0;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    z-index: 1000;
+    height: 75px;
+}
+
+.print-btn {
+    height: 35px !important;
+    width: auto !important;
+    padding: 0px 20px;
+    font-size: 14px;
+    font-family: "Roboto Medium";
+}
+
+.PrintHTML, .PrintPDF {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.borderLine {
+    margin: 0 -150px 40px -150px;
+    padding: 40px 0 0 0;
+    border-bottom: 1px solid #d6d6d6;
+}
+
+.PrintPDF:first-child {
+    padding-top: 0;
+}
+
+.PrintPDF:last-child {
+    border-bottom: 0px !important;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pdf-frames{
+    text-align: center;
+}
+
+.pdf-header{
+    position: relative;
+    margin: 0 35px;
+}
+
+.total-page{
+    position: absolute;
+    right: 0px;
+    bottom: 10px;
+    color: #444;
+}
+
+.pdf-frames:last-child{
+    padding-bottom: 40px;
+}
+
+.dwld-header{
+    padding-top: 20px !important;
+    height: auto;
+    padding-bottom: 20px !important;
+    position: relative;
+}
+
+.dwld-header .modal-title{
+    font-size: 28px;
+    color: #333;
+    line-height: 28px;
+}
+
+.closeIcon{
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    cursor: pointer;
+}
+
+.dwld-body{
+    display: flex;
+    flex-direction: column;
+    color: #5d5d5d;
+    padding: 0 20px !important;
+}
+
+.dwld-footer{
+    margin: 0 !important;
+}
+
+.dwld-btn{
+    margin: 0 !important;
+    max-width: 150px !important;
+}
+
+
+.borderLine {
+    margin: 0 0 40px 0;
+}
+
+.hideDoc{
+    visibility: hidden;
+}
+
+.showDoc{
+    visibility: visible;
+}
+
+/*********** RESPONSIVE DESIGN *************/
+   @media only screen and (max-width: 339px) {
+  
+   }   
+
+   
+   @media only screen and (min-width: 240px) and (max-width: 767px) {
+    .title{
+        margin: 0 20px;
+    }
+
+    .pages{
+        text-align: left;
+        padding-bottom: 20px; 
+    }
+
+    .total-page{
+        text-align: left;
+        padding: 0 0 7px;
+        position: relative;
+        right: auto;
+        bottom: auto;
+    }
+
+    .pdf-header{
+        margin: 0;
+    }
+  
+   }
+
+   @media only screen and (min-width: 768px) and (max-width: 1024px) {
+    .title{
+        margin: 75px 20px 0;
+    }
+   }
+   
+   @media only screen and (min-width: 240px) and (max-width: 1024px) {
+    
+    .title{
+        position: relative;
+        height: auto;
+        flex-direction: column;
+        width: calc(100% - 40px);
+        padding: 0;
+        border-bottom: 1px solid #d6d6d6;
+        z-index: 888;
+    }
+
+    .title div{
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .title-text{
+        color: #333;
+    }
+
+    .print-btn-div{
+        padding: 20px 0;
+    }
+
+    .containerDiv{
+        margin: 0 20px;
+        padding: 20px 0;
+    }
+
+   }
+
+   
+   @media only screen and (min-width: 768px) and (max-width: 1024px) {
+   
+   }
+   
+   
+   @media only screen and (min-width: 1025px) {
+    
+   }
+   
+
+   @media only screen and (min-width: 1441px) {
+    
+   }
+
+   
+   @media only screen and (min-width: 768px){
+    
+   }
+   
