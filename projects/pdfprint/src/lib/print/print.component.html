@@ -1,0 +1,140 @@
+
+<div id="PRINT_PAGE" class="print-page">
+  <div class="title printHide">
+      <div class="col-md-3 col-lg-3 logo">
+      </div>
+      <div class="col-md-6 col-lg-6 details">
+          <div class="title-text">
+              <span class="text-hdr">Shipment Documents</span>
+              <span class="info">Please print all the documents below and follow instructions to prepare your
+                  shipment for collection.</span>
+          </div>
+      </div>
+      <div class="col-md-3 col-lg-3 print-btn-div">
+          <button class="print-btn" (click)="printAllDocs()">Print All Documents</button>
+      </div>
+  </div>
+
+  <div class="containerDiv" id="main_DIV">
+      <div class="PrintHTML" id="PrintHTML" *ngFor="let html of docs['htmlArray']; let i = index">
+          <div *ngIf="i>0?docs['htmlArray'][i-1].label !== docs['htmlArray'][i].label:false" class="borderLine printHide"></div>
+          <p *ngIf="i>0?docs['htmlArray'][i-1].label !== docs['htmlArray'][i].label:true" class="pages printHide">{{html.label}}</p>
+          <div *ngIf="html.label === invoice && inv_count>1" class="inv_page_Count">
+              <p *ngIf="i>0?docs['htmlArray'][i-1].label !== docs['htmlArray'][i].label:true ; else page2" class="pageCount">Page
+                  1 of 2</p>
+              <ng-template #page2>
+                  <p class="pageCount">Page 2 of 2</p>
+              </ng-template>
+          </div>
+          <iframe frameborder="0" id="{{html_ID}}{{i}}" class="iframes html" [ngClass]="(html.label !== invoice) ? html.label : invoiceClass(i, docs) "
+              [src]="html.Doc | safe: 'resourceUrl'" type="text/html"></iframe>
+          <div id={{connote}} *ngIf="html.label === connote" class="instruction">** Instructions: Hand this document
+              to the driver. **</div>
+          <div *ngIf="html.label === invoice">
+              <div *ngIf="inv_count>1;else FULL_INST">
+                  <div id={{invoice}} *ngIf="i>0?docs['htmlArray'][i-1].label !== docs['htmlArray'][i].label:true ; else FULL_INST"
+                      class="instruction inv">
+                      ** Instructions: Hand this document to the driver. **</div>
+              </div>
+              <ng-template #FULL_INST>
+                  <div id={{invoice}} class="instruction inv">** Instructions: Add your name, job
+                      title and sign the document. <br /> Hand this document to the driver. **</div>
+              </ng-template>
+          </div>
+          <div id={{manifest}} *ngIf="html.label === manifest" class="instruction">** Instructions: Hand this
+              document
+              to the driver. **
+          </div>
+          <div id={{routing}} *ngIf="html.label === routing" class="instruction">** Instructions: Stick
+              this label to the package. **
+              <br />
+              <div class="flex">
+                  <img class="paper-cut" src="./assets/images/paper-cut.png">
+              </div>
+          </div>
+          <div id="shpmntInfo" *ngIf="html.label === routing" class="instruction shpmntInfo">
+              <span class="bold spmInfo">Shipment Information</span><br /><br />
+              <span class="bold spmHdr">This shipment will be collected on</span><br />
+              {{html['shipmentInfoDto']['ship-collection-date']}}<br />
+              between {{html['shipmentInfoDto']['collection-time-from']}} h
+              and {{html['shipmentInfoDto']['collection-time-to']}} h <br /><br />
+              <span class="bold spmHdr">Collection Address</span> <br />
+              {{html['shipmentInfoDto']['ship-comp-name']}}<br />
+              {{html['shipmentInfoDto']['address-line-one']}}<br />
+              {{html['shipmentInfoDto']['city-name']}}, {{html['shipmentInfoDto']['zip-code']}}<br />
+              {{html['shipmentInfoDto']['country-name']}}<br />
+          </div>
+      </div>
+      <div class="printDIVOnly printHide">
+          <div>
+              <canvas hidden class="canvasPdf" id={{canvas_ID}}></canvas>
+              <div class="pdf-frames" *ngFor="let arr of pdfPagesArray;let i=index">
+                  <div class="borderLine"></div>
+                  <div class="pdf-header">
+                      <p class="pages">{{arr?.name}}</p>
+                      <p class="total-page">Total Pages : {{arr?.pageNo}}</p>
+                  </div>
+                  <canvas class="canvasPdf" id="{{canvas_ID}}{{i+1}}"></canvas>
+              </div>
+          </div>
+      </div>
+
+      <div class="no-data" *ngIf="paperworkStatus === 'ERR'">
+          Sorry, there was an error retrieving your Shipment Documents. Please try again.
+      </div>
+  </div>
+</div>
+
+<a class="btn btn-primary trigger-modal" id="dwnld_pdfLink" data-toggle="modal" href='#dwonld_pdf'></a>
+
+<div id="printing1-TR" class="toaster" *ngIf="printing[0]">
+  <div class="toaster-text-scs center" id="printing1">
+      <div class="fixed-toaster-div">
+          <div id="fixed-success-block" class="whiteBG">
+              Printing Shipment Documents : <i class="bold">Part 1/<i class="bold" *ngIf="docs['pdfArray'].Doc">2</i><i
+                      class="bold" *ngIf="!docs['pdfArray'].Doc">1</i></i>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div id="printing2-TR" class="toaster" *ngIf="printing[1]">
+  <div class="toaster-text-scs center" id="printing2">
+      <div class="fixed-toaster-div">
+          <div id="fixed-success-block" class="whiteBG">
+              Printing Shipment Documents : <i class="bold">Part 2/2</i>
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- <div id="pdfError-TR" class="toaster" *ngIf="pdfRenderError === 'ERROR'">
+  <div class="toaster-text-scs center" id="pdfError">
+      <div class="fixed-toaster-div">
+          <div id="fixed-error-block" class="">
+              Sorry, something went wrong! System is retrying the pdf print. PLease wait...
+          </div>
+      </div>
+  </div>
+</div> -->
+
+<div class="modal fade" id="dwonld_pdf">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          <div class="modal-header dwld-header">
+              <h4 class="modal-title" id="title-download">Sorry!</h4>
+              <img id="close" data-dismiss="modal" class="closeIcon" src="./assets/images/icon_close-purple.png">
+          </div>
+          <div class="modal-body dwld-body" id="modal-body-download">
+              Unable to print at this moment.<br/> Please download and print manually.
+          </div>
+          <div class="modal-footer dwld-footer">
+              <button (click)="donwloadPDF()" id="dwonld_pdf_btn" type="button" class="btn btn-primary dwld-btn">Download</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+<div class="loaderImage" *ngIf="isLoaderEnabled"></div>
+<a style="display:none;" id="A_DOWNLOAD"></a>
+<iframe style="display:none;" id='PDF_IFRAME' [src]="docs['pdfArray'].Doc | safe: 'resourceUrl'"></iframe>
