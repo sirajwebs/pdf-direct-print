@@ -1,11 +1,13 @@
 /**
  * Owner : SIRAJUDDIN AHAMMED (siraj.home@gmail.com)
  * MIT Licence
+ * required librabry : pdf.js by Mozilla (MIT)
  * Typescript code in this page
  */
 
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import * as PDFJS from '../assets/pdfjs-2.0.943-dist/build/pdf.js';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-pdfprint',
@@ -14,27 +16,29 @@ import * as PDFJS from '../assets/pdfjs-2.0.943-dist/build/pdf.js';
 })
 export class PdfprintComponent implements OnInit, AfterViewInit {
 
-  PDF_URL = 'application/pdf';
-  docs = {
-    'pdfArray': {}
-  };
-  pdf_ID = 'pdf_';
-  canvas_ID = 'canvasPDF_';
-  page_count_ID = 'page_count';
-  cnDiv = 'PDF_CANVAS_DIV';
-  totalPage = 0;
-  pdfPagesArray = [];
-  nonBrowserSupport = false;
-  totalPDFpage = 0;
+  PDF: any; // pdf input in base64 or blob url
+  readonly canvas_ID = 'canvasPDF_';
   isPortraitPage = false;
   isLandscapePage = false;
-
-  constructor() { }
+  renderError = false;
+  constructor(private sanitizer: DomSanitizer) { }
 
   ngOnInit() {
-    this.nonBrowserSupport = (navigator.userAgent.toLowerCase().indexOf('firefox') > -1);
-    this.docsInit();
-    // this.pdfRenderCall();
+
+    // this.PDF = 'JVBERi0xLjMNCiXi48/TDQoNCjEgMCBvYmoNCjw8DQovVHlwZSAvQ2F0YWxvZw0KL091dGxpbmVzIDIgMCBSDQovUGFnZXMgMyAwIFINCj4+DQplbmRvYmoNCg0KMiAwIG9iag0KPDwNCi9UeXBlIC9PdXRsaW5lcw0KL0NvdW50IDANCj4+DQplbmRvYmoNCg0KMyAwIG9iag0KPDwNCi9UeXBlIC9QYWdlcw0KL0NvdW50IDINCi9LaWRzIFsgNCAwIFIgNiAwIFIgXSANCj4+DQplbmRvYmoNCg0KNCAwIG9iag0KPDwNCi9UeXBlIC9QYWdlDQovUGFyZW50IDMgMCBSDQovUmVzb3VyY2VzIDw8DQovRm9udCA8PA0KL0YxIDkgMCBSIA0KPj4NCi9Qcm9jU2V0IDggMCBSDQo+Pg0KL01lZGlhQm94IFswIDAgNjEyLjAwMDAgNzkyLjAwMDBdDQovQ29udGVudHMgNSAwIFINCj4+DQplbmRvYmoNCg0KNSAwIG9iag0KPDwgL0xlbmd0aCAxMDc0ID4+DQpzdHJlYW0NCjIgSg0KQlQNCjAgMCAwIHJnDQovRjEgMDAyNyBUZg0KNTcuMzc1MCA3MjIuMjgwMCBUZA0KKCBBIFNpbXBsZSBQREYgRmlsZSApIFRqDQpFVA0KQlQNCi9GMSAwMDEwIFRmDQo2OS4yNTAwIDY4OC42MDgwIFRkDQooIFRoaXMgaXMgYSBzbWFsbCBkZW1vbnN0cmF0aW9uIC5wZGYgZmlsZSAtICkgVGoNCkVUDQpCVA0KL0YxIDAwMTAgVGYNCjY5LjI1MDAgNjY0LjcwNDAgVGQNCigganVzdCBmb3IgdXNlIGluIHRoZSBWaXJ0dWFsIE1lY2hhbmljcyB0dXRvcmlhbHMuIE1vcmUgdGV4dC4gQW5kIG1vcmUgKSBUag0KRVQNCkJUDQovRjEgMDAxMCBUZg0KNjkuMjUwMCA2NTIuNzUyMCBUZA0KKCB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiApIFRqDQpFVA0KQlQNCi9GMSAwMDEwIFRmDQo2OS4yNTAwIDYyOC44NDgwIFRkDQooIEFuZCBtb3JlIHRleHQuIEFuZCBtb3JlIHRleHQuIEFuZCBtb3JlIHRleHQuIEFuZCBtb3JlIHRleHQuIEFuZCBtb3JlICkgVGoNCkVUDQpCVA0KL0YxIDAwMTAgVGYNCjY5LjI1MDAgNjE2Ljg5NjAgVGQNCiggdGV4dC4gQW5kIG1vcmUgdGV4dC4gQm9yaW5nLCB6enp6ei4gQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gQW5kICkgVGoNCkVUDQpCVA0KL0YxIDAwMTAgVGYNCjY5LjI1MDAgNjA0Ljk0NDAgVGQNCiggbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiApIFRqDQpFVA0KQlQNCi9GMSAwMDEwIFRmDQo2OS4yNTAwIDU5Mi45OTIwIFRkDQooIEFuZCBtb3JlIHRleHQuIEFuZCBtb3JlIHRleHQuICkgVGoNCkVUDQpCVA0KL0YxIDAwMTAgVGYNCjY5LjI1MDAgNTY5LjA4ODAgVGQNCiggQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgKSBUag0KRVQNCkJUDQovRjEgMDAxMCBUZg0KNjkuMjUwMCA1NTcuMTM2MCBUZA0KKCB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBFdmVuIG1vcmUuIENvbnRpbnVlZCBvbiBwYWdlIDIgLi4uKSBUag0KRVQNCmVuZHN0cmVhbQ0KZW5kb2JqDQoNCjYgMCBvYmoNCjw8DQovVHlwZSAvUGFnZQ0KL1BhcmVudCAzIDAgUg0KL1Jlc291cmNlcyA8PA0KL0ZvbnQgPDwNCi9GMSA5IDAgUiANCj4+DQovUHJvY1NldCA4IDAgUg0KPj4NCi9NZWRpYUJveCBbMCAwIDYxMi4wMDAwIDc5Mi4wMDAwXQ0KL0NvbnRlbnRzIDcgMCBSDQo+Pg0KZW5kb2JqDQoNCjcgMCBvYmoNCjw8IC9MZW5ndGggNjc2ID4+DQpzdHJlYW0NCjIgSg0KQlQNCjAgMCAwIHJnDQovRjEgMDAyNyBUZg0KNTcuMzc1MCA3MjIuMjgwMCBUZA0KKCBTaW1wbGUgUERGIEZpbGUgMiApIFRqDQpFVA0KQlQNCi9GMSAwMDEwIFRmDQo2OS4yNTAwIDY4OC42MDgwIFRkDQooIC4uLmNvbnRpbnVlZCBmcm9tIHBhZ2UgMS4gWWV0IG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gKSBUag0KRVQNCkJUDQovRjEgMDAxMCBUZg0KNjkuMjUwMCA2NzYuNjU2MCBUZA0KKCBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSB0ZXh0LiBBbmQgbW9yZSApIFRqDQpFVA0KQlQNCi9GMSAwMDEwIFRmDQo2OS4yNTAwIDY2NC43MDQwIFRkDQooIHRleHQuIE9oLCBob3cgYm9yaW5nIHR5cGluZyB0aGlzIHN0dWZmLiBCdXQgbm90IGFzIGJvcmluZyBhcyB3YXRjaGluZyApIFRqDQpFVA0KQlQNCi9GMSAwMDEwIFRmDQo2OS4yNTAwIDY1Mi43NTIwIFRkDQooIHBhaW50IGRyeS4gQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gQW5kIG1vcmUgdGV4dC4gKSBUag0KRVQNCkJUDQovRjEgMDAxMCBUZg0KNjkuMjUwMCA2NDAuODAwMCBUZA0KKCBCb3JpbmcuICBNb3JlLCBhIGxpdHRsZSBtb3JlIHRleHQuIFRoZSBlbmQsIGFuZCBqdXN0IGFzIHdlbGwuICkgVGoNCkVUDQplbmRzdHJlYW0NCmVuZG9iag0KDQo4IDAgb2JqDQpbL1BERiAvVGV4dF0NCmVuZG9iag0KDQo5IDAgb2JqDQo8PA0KL1R5cGUgL0ZvbnQNCi9TdWJ0eXBlIC9UeXBlMQ0KL05hbWUgL0YxDQovQmFzZUZvbnQgL0hlbHZldGljYQ0KL0VuY29kaW5nIC9XaW5BbnNpRW5jb2RpbmcNCj4+DQplbmRvYmoNCg0KMTAgMCBvYmoNCjw8DQovQ3JlYXRvciAoUmF2ZSBcKGh0dHA6Ly93d3cubmV2cm9uYS5jb20vcmF2ZVwpKQ0KL1Byb2R1Y2VyIChOZXZyb25hIERlc2lnbnMpDQovQ3JlYXRpb25EYXRlIChEOjIwMDYwMzAxMDcyODI2KQ0KPj4NCmVuZG9iag0KDQp4cmVmDQowIDExDQowMDAwMDAwMDAwIDY1NTM1IGYNCjAwMDAwMDAwMTkgMDAwMDAgbg0KMDAwMDAwMDA5MyAwMDAwMCBuDQowMDAwMDAwMTQ3IDAwMDAwIG4NCjAwMDAwMDAyMjIgMDAwMDAgbg0KMDAwMDAwMDM5MCAwMDAwMCBuDQowMDAwMDAxNTIyIDAwMDAwIG4NCjAwMDAwMDE2OTAgMDAwMDAgbg0KMDAwMDAwMjQyMyAwMDAwMCBuDQowMDAwMDAyNDU2IDAwMDAwIG4NCjAwMDAwMDI1NzQgMDAwMDAgbg0KDQp0cmFpbGVyDQo8PA0KL1NpemUgMTENCi9Sb290IDEgMCBSDQovSW5mbyAxMCAwIFINCj4+DQoNCnN0YXJ0eHJlZg0KMjcxNA0KJSVFT0YNCg==';
+    // this.pdfInit('BASE64'.toUpperCase());
+
+    this.PDF = 'http://www.africau.edu/images/default/sample.pdf';
+
+    this.PDF = this.getlink(this.PDF);
+    console.log(this.PDF);
+
+    // this.pdfInit('BLOB'.toUpperCase());
+
+  }
+
+  getlink(url): SafeUrl {
+    return this.sanitizer.bypassSecurityTrustUrl(url);
   }
 
   ngAfterViewInit() {
@@ -42,69 +46,55 @@ export class PdfprintComponent implements OnInit, AfterViewInit {
   }
 
   pdfRenderCall() {
-    /**
-     * methods to render the combined pdf files and to get the first page of each files
-     */
-    let urls = '';
-    try {
-      urls = this.docs['pdfArray']['Doc'];
-      this.pdfPagesArray = this.docs['pdfArray']['pdfFiles'] ?
-        this.docs['pdfArray']['pdfFiles'] : [];
-    } catch (error) { }
-
     setTimeout(() => {
-      /**
-       * timeout to wait for the rendering to start
-       */
-      let page = 1;
-      if (this.pdfPagesArray) {
-        for (let i = 1; i <= this.pdfPagesArray.length; i++) {
-          if (urls.length) {
-            this.renderPdf(urls, page, this.canvas_ID + i);
-            page += this.pdfPagesArray[i - 1]['pageNo'];
-          }
-          if (i === this.pdfPagesArray.length) { this.totalPDFpage = page - 1; }
+      /*** timeout to wait for the rendering to start */
+      if (this.PDF) {
+        let page = 1;
+        for (let i = 1; i <= 1; i++) {
+          this.renderPdf(this.PDF, page, this.canvas_ID + i);
+          page++;
         }
       }
     }, 1000);
   }
 
-  donwloadPDF(ref) {
-    const urls = this.docs['pdfArray']['Doc'];
+  donwloadPDF() {
     const a = <HTMLAnchorElement>document.getElementById('A_DOWNLOAD');
     a.style.display = 'none';
-    a.href = urls;
-    a.download = ref + '_pdf_file.pdf';
+    a.href = this.PDF;
+    a.download = 'print-pdf-file.pdf';
     a.click();
   }
 
-  docsInit() {
+  pdfInit(fileType: string) {
     /**
+     * @param fileType as 'base64' or 'blob' ;
      * intialize the documents and segregate for Labels and PDF
      */
-    const pdf = this.docs['pdfArray'];
-    let temp_pdf = '';
-    if (pdf['Doc']) {
-      /**
-       * create pdf file from base64
-       */
-      temp_pdf = this.base64ToBLOB(pdf['Doc'], this.PDF_URL);
-      if (this.nonBrowserSupport) {
-        /**
-         * convert pdf files to canvas images to print in Mozilla firefox
-         */
-        setTimeout(() => { this.convertPdf2Image(temp_pdf); }, 2000);
-      }
+    switch (fileType) {
+      case 'BASE64':
+        if (this.PDF) {
+          let temp_pdf = '';
+          /*** create pdf file from base64 */
+          temp_pdf = this.base64ToBLOB(this.PDF);
+          /*** convert pdf files to canvas images to print */
+          setTimeout(() => { this.convertPdf2Image(temp_pdf); }, 2000);
+          this.PDF = temp_pdf;
+        }
+        break;
+      case 'BLOB':
+        this.convertPdf2Image(this.PDF);
+        break;
+      default:
+        break;
     }
-    this.docs['pdfArray']['Doc'] = temp_pdf;
+
   }
 
-  base64ToBLOB(b64Data, contentType1) {
-    /**
-     * this fuctions convert the base54 encode to the blob url
-     */
-    const b64toBlob = (b64Data1, contentType = '', sliceSize = 512) => {
-      const byteCharacters = atob(b64Data1);
+  base64ToBLOB(b64Data) {
+    /*** this fuctions convert the base54 encode to the blob url */
+    const b64toBlob = (b64DataTemp, sliceSize = 512) => {
+      const byteCharacters = atob(b64DataTemp);
       const byteArrays = [];
       for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
         const slice = byteCharacters.slice(offset, offset + sliceSize);
@@ -115,52 +105,34 @@ export class PdfprintComponent implements OnInit, AfterViewInit {
         const byteArray = new Uint8Array(byteNumbers);
         byteArrays.push(byteArray);
       }
-      const blob = new Blob(byteArrays, { type: contentType });
+      const blob = new Blob(byteArrays, { type: 'application/pdf' });
       return blob;
     };
-    /**
-     * call the function to convert the base64 and create the blob url
-     */
-    const blob1 = b64toBlob(b64Data, contentType1);
-    const blobUrl = URL.createObjectURL(blob1);
+    /*** call the function to convert the base64 and create the blob url */
+    const blob = b64toBlob(b64Data),
+      blobUrl = URL.createObjectURL(blob);
     return blobUrl;
   }
 
   printPDF() {
-    /**
-     * callback method after the first print dialog box is closed to print the PDFs
-     */
-    const pdf = this.docs['pdfArray'];
-
-    if (pdf['Doc']) {
-      const iframe = <HTMLFrameElement>document.getElementById('PDF_IFRAME');
-        /**
-         * wait till printing msg showing is over
-         */
-        if (!this.nonBrowserSupport) {
-          iframe.contentWindow.print();
-        } else {
-          /**
-           * catch if error occured in browser like Mozilla and IE
-           */
-          if (!this.isPortraitPage && this.isLandscapePage) {
-            this.printPDFSupport('landscape');
-          } else {
-            this.printPDFSupport('portrait');
-          }
-        }
+    /*** callback method after the first print dialog box is closed to print the PDFs */
+    if (this.PDF) {
+      if (!this.isPortraitPage && this.isLandscapePage) {
+        this.printPDFSupport('landscape');
+      } else {
+        this.printPDFSupport('portrait');
+      }
     }
   }
 
   printPDFSupport(mode) {
-    /**
-     * create the html to open and print the html page containing the pdf file as image
-     */
-    const pdf_cnvs = document.getElementById(this.cnDiv);
+    /** create the html to open and print the html page containing the pdf file as image */
+    const pdf_cnvs = document.getElementById('PDF_CANVAS_DIV');
+    this.renderError = false;
     if (pdf_cnvs ? !pdf_cnvs.innerHTML : 1) {
-      const pdf = this.docs['pdfArray'];
-      this.convertPdf2Image(pdf['Doc']);
-      document.getElementById('dwnld_pdfLink').click();
+      const pdf = this.PDF;
+      this.convertPdf2Image(pdf);
+      this.renderError = true;
     } else {
       /**
        * opening the pdf file as images embeded to a html (open new window) is required
@@ -207,7 +179,7 @@ export class PdfprintComponent implements OnInit, AfterViewInit {
      * @property {number} documentIndex
      * @property {number} pageNumber
      */
-    const pdfDocs = [];
+    const pdfPDF = [];
     /**
      * @property {PageInfo}
      */
@@ -227,7 +199,7 @@ export class PdfprintComponent implements OnInit, AfterViewInit {
     function renderPage(num) {
       pageRendering = true;
       current = getPageInfo(num);
-      pdfDocs[current.documentIndex]
+      pdfPDF[current.documentIndex]
         .getPage(current.pageNumber).then(function (page) {
           let scaleResize = 1;
           let viewport = page.getViewport(scale);
@@ -255,29 +227,17 @@ export class PdfprintComponent implements OnInit, AfterViewInit {
     }
 
     /**
-     * If another page rendering in progress, waits until the rendering is
-     * finished. Otherwise, executes rendering immediately.
-     */
-    function queueRenderPage(num) {
-      if (pageRendering) {
-        pageNumPending = num;
-      } else {
-        renderPage(num);
-      }
-    }
-
-    /**
      * @returns PageNumber
      */
     function getPageInfo(num) {
       let totalPageCount1 = 0;
-      for (let docIdx = 0; docIdx < pdfDocs.length; docIdx++) {
+      for (let docIdx = 0; docIdx < pdfPDF.length; docIdx++) {
 
-        totalPageCount1 += pdfDocs[docIdx].numPages;
+        totalPageCount1 += pdfPDF[docIdx].numPages;
         if (num <= totalPageCount1) {
           return { documentIndex: docIdx, pageNumber: num };
         }
-        num -= pdfDocs[docIdx].numPages;
+        num -= pdfPDF[docIdx].numPages;
       }
 
       return false;
@@ -286,7 +246,7 @@ export class PdfprintComponent implements OnInit, AfterViewInit {
     function load() {
       /*** Load PDFs one after another */
       PDFJS.getDocument(urls).then(function (pdfDoc_) {
-        pdfDocs.push(pdfDoc_);
+        pdfPDF.push(pdfDoc_);
         /*** Initial/first/given page rendering */
         renderPage(pageNum);
       });
@@ -303,18 +263,19 @@ export class PdfprintComponent implements OnInit, AfterViewInit {
     const pages = [], scale = 2, a4width = 2000, self = this;
     this.isPortraitPage = false;
     this.isLandscapePage = false;
+
     function draw() {
       /**
        * draw the final canvas image when all the pages are rendered
        */
-      const canvas = [], img = [], ctx = [], pgbrk = [], divInner = [], cnDiv = 'PDF_CANVAS_DIV';
+      const canvas = [], img = [], ctx = [], pgbrk = [], divInner = [];
       const divParent = document.createElement('div');
       divParent.style.cssText = 'margin: 100px; width';
       divParent.style.display = 'none';   // required
       document.body.appendChild(divParent);
       const div = document.createElement('div');
       div.style.cssText = 'display: flex; ' + 'flex-direction: column; width:' + a4width + 'px; overflow:hidden;';
-      div.id = cnDiv;
+      div.id = 'PDF_CANVAS_DIV';
       divParent.appendChild(div);
 
       for (let i = 0; i < pages.length; i++) {

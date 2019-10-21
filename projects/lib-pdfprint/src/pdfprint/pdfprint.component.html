@@ -1,27 +1,14 @@
-<div class="col-md-3 col-lg-3 print-btn-div">
-    <button class="print-btn" (click)="printAllDocs()">Print All Documents</button>
-</div>
-
+<button class="print-btn" (click)="printPDF()">Print</button>
 
 <div class="printDIVOnly printHide">
     <canvas hidden class="canvasPdf" id={{canvas_ID}}></canvas>
-    <div class="pdf-frames" *ngFor="let arr of pdfPagesArray;let i=index">
-        <div class="borderLine"></div>
-        <div class="pdf-header">
-            <p class="pages">{{arr?.name}}</p>
-            <p class="total-page">Total Pages : {{arr?.pageNo}}</p>
-        </div>
+    <div class="pdf-frames" *ngFor="let arr of ['ami'];let i=index">
         <canvas class="canvasPdf" id="{{canvas_ID}}{{i+1}}"></canvas>
     </div>
 </div>
-
-<a class="display:none;" id="dwnld_pdfLink" data-toggle="modal" href='#dwonld_pdf'></a>
-
-<div class="modal fade" id="dwonld_pdf">
-    Unable to print at this moment.<br /> Please download and print manually.
-    <button (click)="donwloadPDF()" id="" type="button" class="">Download</button>
+<div class="" id="dwonld_pdf" *ngIf="renderError">
+    Unable to print at this moment. CLick <span (click)="donwloadPDF()"> here </span> to download and print manually.
 </div>
 
 <a style="display:none;" id="A_DOWNLOAD"></a>
-<iframe style="display:none;" id='PDF_IFRAME' title="hidden-frame"
-    [src]="docs['pdfArray'].Doc | safe: 'resourceUrl'"></iframe>
+<iframe style="display:none;" id='PDF_IFRAME' title="hidden-frame" [src]="PDF | safe: 'resourceUrl'"></iframe>
